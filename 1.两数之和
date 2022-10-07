@@ -1,0 +1,48 @@
+1.暴力枚举
+大部分人刚开始的做法可能是二次遍历数组（下面有代码实现），从而找到两个对应的值的和为target，但是时间复杂度就是：O(n^2)，不满足进阶条件。
+
+如果是刚开始学习数据结构与算法的小伙伴则不用过于纠结进阶条件，能过就行。
+
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        int n = nums.size();
+        for (int i = 0; i < n; ++i) {
+            for (int j = i + 1; j < n; ++j) {
+                if (nums[i] + nums[j] == target) {
+                    return {i, j};
+                }
+            }
+        }
+
+        //遍历完全后，仍没有找到符合的索引，则返回空数组即可
+        return {};
+    }
+};
+
+2.哈希表
+利用哈希表可让搜索时间复杂度从O(n)->O(1)，而且哈希表还有一个好处就是让我们不用完全遍历两次数组，进一步提高效率。
+
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        //创建哈希表
+        unordered_map<int,int>hashTable;
+        
+        //遍历数组
+        for(int i=0;i<nums.size();i++){
+            //查找是否有与nums[i]互补的值
+            auto it=hashTable.find(target-nums[i]);
+            //如果找到，则返回对应的指针，没找到就返回end指针，因此可以以此判断是否找到互补的值
+            
+            if(it!=hashTable.end()){//如果在哈希表中找到互补的值，就直接返回索引即可
+                return{it->second,i};
+            }
+            
+            //但如果没找到就插入哈希表中，以便后续查找
+            hashTable[nums[i]]=i;
+        }
+        
+        return {};
+    }
+};
