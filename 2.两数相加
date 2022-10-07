@@ -1,0 +1,43 @@
+注意：题目给的两个链表都是反转好的，我们不需要再去反转。
+
+牛客网的链表题里有一道相同的题，只不过给的两个链表不是已经反转的。
+
+反转链表是很关键的一步操作，因为做运算时，一般都从低位开始，如果从高位开始的话，高（前）一位的两数相加完之后，轮到低（后）一位两数相加完，可能会产生进位，因此还需要考虑高一位的和。又因为题目给的是单向链表，所以我们无法向前操作，只能向后(next)操作。后
+
+以下是代码实现：
+
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode*pre=new ListNode(-1);//创建前驱指针，防止头指针丢失
+        ListNode*cur=pre;//创建副本指针，用来做相应的操作
+        int carry=0;
+        while(l1||l2){//循环条件是指针l1和l2至少有一个不为空
+            
+            //缺的位用0补齐，例如，194+3可以看作：194+003
+            int val1=l1?l1->val:0;
+            int val2=l2?l2->val:0;
+
+            int sum=val1+val2+carry;//注意要将前一位相加的进位加入
+            carry=sum/10;//进位
+            sum%=10;//和要取模10，不然可能会溢出(大于10)
+
+            cur->next=new ListNode(sum);//让cur的next指针指向值等于我们上一步求出的和的节点
+
+            cur=cur->next;//后移cur
+            
+            //只有当指针不为空时，才能后移，不然会报错
+            if(l1){
+                l1=l1->next;
+            }
+            if(l2){
+                l2=l2->next;
+            }
+        }
+        if(carry==1){//注意不要忘记最高位相加进位是1的话，要在最后为填补1
+            cur->next=new ListNode(1);
+        }
+        
+        return pre->next;
+    }
+};
