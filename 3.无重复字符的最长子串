@@ -2,10 +2,6 @@
 
 方法：滑动窗口，顾名思义：假设有一个窗口（哈希表）然后扫过字符串，具体步骤如下。
 
-![image text](https://github.com/Jomocool/LeetCode-CPP/blob/main/LeetCode-img/1.png)
-
-![image text](https://github.com/Jomocool/LeetCode-CPP/blob/main/LeetCode-img/2.png)
-
  代码实现：
 
 class Solution {
