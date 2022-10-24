@@ -1,0 +1,125 @@
+## 5.最长回文子串
+
+```c++
+方法一：暴力解法
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        string longest="";//初始化最长回文子串
+        int maxLen=0;//记录最长回文子串的长度
+        for(int i=0;i<s.length();i++){//s的每个字符都要做一次开头字符
+            for(int j=i+1;j<=s.length();j++){//遍历以s[i]开头的所有字符
+                string tempS=s.substr(i,j-i);
+                if(isPalindrome(tempS)&&tempS.length()>maxLen){
+                    //如果是回文串，并且长度比上一个回文串长，就更新
+                    longest=tempS;
+                    maxLen=longest.length();
+                }
+            }
+        }
+        return longest;
+    }
+
+    //判断s是否为回文串
+    bool isPalindrome(string s){
+        for(int i=0;i<s.length()/2;i++){
+            if(s[i]!=s[s.length()-i-1]){
+                return false;
+            }
+        }
+        return true;
+    }
+};
+//时间复杂度：O(n^3) = 两个for循环(O(n^2)) * 判断回文串(O(n))
+//空间复杂度：O(1)
+
+方法二：动态规划
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int n=s.length();
+        if(n<2){
+            return s;//如果s的长度小于2，那它的最长回文串就是它本身
+        }
+
+        int maxLen=1;
+        int begin=0;
+        vector<vector<bool>>dp(n,vector<bool>(n));
+        //用来记录各字符之间组成的字符串是否为回文串，注意：dp容器默认都为false
+        
+        for(int i=0;i<n;i++){
+            dp[i][i]=true;//s[i]与s[i]组成的字符串就是s[i],肯定是回文串
+        }
+
+        //更新s[i]和s[j]之间的字符串的状态(是否为回文串)
+        for(int L=2;L<=n;L++){
+            for(int i=0;i<n;i++){
+                int j=i+L-1;
+                if(j>=n){//越界访问了
+                    break;
+                }
+                if(s[i]!=s[j]){
+                    dp[i][j]=false;//s[i]!=s[j]，头尾字符不同，必定不可能是回文串
+                }else{
+                    if(j-i<3){
+                   //j-i<3，说明s[i]到s[j]组成的字符串有0,1,2个字符，且s[i]=s[j]，所以肯定为回文串
+                        dp[i][j]=true;
+                    }else{
+                        //因为s[i]=s[j]，所以只要s[i+1]到s[j-1]组成的字符串是回文串就可以了。
+                        //即f(i,j)=f(i+1,j-1)，其中f函数是判断s(i,j)是否为回文串
+                        dp[i][j]=dp[i+1][j-1];
+                    }
+                }
+                //更新最长回文子串的状态
+                if(dp[i][j]&&j-i+1>maxLen){
+                    maxLen=j-i+1;
+                    begin=i;
+                }
+            }
+        }
+        return s.substr(begin,maxLen);
+    }
+};
+//时间复杂度：O(n^2)
+//空间复杂度：O(n^2)
+
+方法三：中心扩展算法
+    
+//边界情况:P(i,i),p(i,i+1),即中心长度为1或2时，因为每次判断时必定是两边各添加一个字符，总共就是两个字符。
+//假设边界情况为1，那每次长度为：1，3，5，7，2n+1
+//假设边界情况为2，那每次长度为：2，4，6，8，2n
+//这样奇偶情况都有了，即涵盖了所有情况
+
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int start=0,end=0;
+        for(int i=0;i<s.size();i++){
+            auto [left1,right1]=expandAroundCenter(s,i,i);
+            auto [left2,right2]=expandAroundCenter(s,i,i+1);
+            if(right1-left1>end-start){
+                //更新最长回文子串
+                start=left1;
+                end=right1;
+            }
+            if(right2-left2>end-start){
+                //更新最长回文子串
+                start=left2;
+                end=right2;
+            }
+        }
+        return s.substr(start,end-start+1);
+    }
+
+    //以s(left,right)为中心，向两边扩展，直到不是回文串
+    pair<int,int>expandAroundCenter(const string& s,int left,int right){
+        while(left>=0&&right<s.size()&&s[left]==s[right]){
+            left--;
+            right++;
+        }
+        return {left+1,right-1};
+    }
+};
+//时间复杂度：O(n^2)
+//空间复杂度：O(1)
+```
